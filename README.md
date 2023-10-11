@@ -17,7 +17,7 @@ Some major missing features that may be a to-do someday:
 
 * currently missing static types, only has run-time type checking
 * no string type at all
-* has a slow, tree walking interpreter. a compiled-to-VM version could be next
+* has a slow, tree walking interpreter, a compiled-to-VM version could be next
 
 
 # Running
