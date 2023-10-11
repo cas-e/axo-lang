@@ -1,0 +1,70 @@
+; 
+; basic notions
+; 
+
+def eq λx y. μ x | y true | _ false
+def uneq λx y. (not (eq x y))
+
+def comp λf g x.(f (g x))
+
+; a workaround for not having a nice function composistion syntax,
+; do takes a list of functions and applies them in left to right order
+; in succession. like a "backwards" series of compositions, or a pipe
+def do λlofs x. μ lofs 
+| []            x
+| (cons \f \fs) (do fs (f x))
+
+;
+; a few list facilities
+;
+
+def singleton λls. μ ls | [_] true | _ false
+
+def map λf l. μ l
+| [] 	       []
+| (cons \x \y) (cons (f x) (map f y))
+
+def filter λp ls. μ ls
+| []            []
+| (cons \x \xs) ? (p x) (cons x (filter p xs)) (filter p xs) 
+
+def foldr λf id ls. μ ls
+| []            id
+| (cons \x \xs) (f x (foldr f id xs))
+
+def append λl r. μ l
+| []            r
+| (cons \x \xs) (cons x (append xs r))
+
+def concat (foldr append [])
+
+def take λn ls. ? (eq 0 n) [] (cons (car ls) (take (- n 1) (cdr ls)))
+
+def drop λn ls. μ n
+| 0 ls
+| _ (drop (- n 1) (cdr ls))
+
+def all λp ls.(foldr and true (map p ls))
+def any λp ls.(foldr or false (map p ls))
+
+def elem-of λx ls. (any (eq x) ls)
+def not-elem λx ls. (all (uneq x) ls)
+
+def no-dupes λls. μ ls
+| []            true
+| (cons \x \xs) (and (not-elem x xs) (no-dupes xs))
+ 
+; subtract every ys from xs
+def list-sub λxs ys. μ xs
+| [] []
+| (cons \x \xs) ? (elem-of x ys) (list-sub xs ys) (cons x (list-sub xs ys))
+
+def break λp ls.
+μ ls
+| [] [[] []]
+| (cons \x \xs)
+  ? (p x)
+    [[] ls]
+    let [\ys \zs] (break p xs)
+    [(cons x ys) zs]
+    

@@ -1,0 +1,76 @@
+
+;
+; A simple sudoku solver
+; Based on the haskell program in Richard Bird's functional pearl:
+; "A program to solve Sudoku"
+
+def main (solve sudoku-puzzle)
+
+def solve λg.(search (choices g))
+
+def search λcm.
+let pm (prune cm)
+? (blocked pm)  []
+? (complete pm) (extract pm)
+                (concat (map search (expand1 pm) ) ) 
+
+def extract (map (map car))
+def complete (all (all singleton))
+def void (any (any (eq [])))
+def ok (do [(filter singleton) concat no-dupes])
+def safe λcm.
+  (and (all ok (rows cm))
+  (and (all ok (cols cm))
+       (all ok (boxs cm))))
+def blocked λm.(or (void m) (not (safe m)))
+
+def expand1 λrows.
+  let [\rows1 (cons \row \rows2)] (break (any (comp not singleton)) rows)
+  let [\row1 (cons \cs \row2)] (break (comp not singleton) row)
+  let expand λc.(concat [rows1 [(append row1 (cons [c] row2))] rows2])
+  (map expand cs)
+
+def prune (do [(prune-by rows) (prune-by cols) (prune-by boxs)])
+def prune-by λf grid. (f (map reduce-choices (f grid))) 
+def reduce-choices λrow.
+  let s (singles row)
+  (map λx.(minus x s) row)
+def singles λls.(concat (filter singleton ls))
+def minus λxs ys. ? (singleton xs) xs (list-sub xs ys)
+
+def digits [1 2 3 4 5 6 7 8 9]
+def blank (eq 0)
+def choice λd. ? (blank d) digits [d]
+def choices (map (map choice))
+
+def rows λg.(id g)
+def cols λg.(transpose g)
+def boxs (do [(map chop) chop (map cols) concat (map concat)])
+
+def id λx.x
+def chop λxs. μ xs
+  | [] []
+  | _ (cons (take 3 xs) (chop (drop 3 xs)))
+def transpose λg. μ g
+  | (cons [] _) []
+  | []          []
+  | _           (cons (map car g) (transpose (map cdr g)))
+
+
+; test data
+
+def sudoku-puzzle
+[
+ [6 2 9  0 7 8  3 0 0]
+ [0 0 0  0 4 3  7 0 0]
+ [0 0 0  0 0 0  0 0 1]
+
+ [5 0 0  0 0 0  0 7 9]
+ [0 3 0  8 9 0  0 6 0]
+ [0 1 0  4 0 7  5 3 0]
+
+ [8 6 0  7 2 0  0 1 0]
+ [0 9 0  3 8 6  0 5 0]
+ [2 4 3  0 0 9  6 0 0]
+]
+

@@ -1,0 +1,34 @@
+; A simple example of how data can be represented in axo
+
+; This example algebraic simplifier is based on John Harrison's from
+; *The Handbook of Practical Logic and Automated Reasoning*
+
+; (0 * x + 1) * 3 + 12
+
+def example
+[:add
+    [:mul
+        [:add
+            [:mul [:num 0] [:var :x]]
+            [:num 1]]
+        [:num 3]]
+    [:num 12]]
+
+
+def simplify λexpr.
+μ expr
+| [:add \e1 \e2] -> (simplify1 [:add (simplify e1) (simplify e2)])
+| [:mul \e1 \e2] -> (simplify1 [:mul (simplify e1) (simplify e2)])
+| _              -> (simplify1 expr)
+
+def simplify1 λexpr.
+μ expr
+| [:add [:num \x] [:num \y]] -> [:num (+ x y)]
+| [:mul [:num \x] [:num \y]] -> [:num (* x y)]
+| [:add [:num 0] \x]         -> x
+| [:add \x [:num 0]]         -> x
+| [:mul [:num 0] \x]         -> [:num 0]
+| [:mul \x [:num 0]]         -> [:num 0]
+| [:mul [:num 1] \x]         -> x
+| [:mul \x [:num 1]]         -> x
+| _                          -> expr
