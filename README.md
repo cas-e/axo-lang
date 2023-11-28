@@ -11,7 +11,7 @@ Some of its features include:
 
 And it supports the basic types:
 
-* numbers, symbols, lists, booleans, and closures
+* numbers, symbols, lists, and booleans
 
 Some major missing features that may be a to-do someday:
 
