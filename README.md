@@ -1,6 +1,6 @@
 # The Axo Programming Language
 
-Axo is a **toy** functional programming language, built in Go, created as a learning exercise. 
+Axo is a toy functional programming language, built in Go, created as a learning exercise. 
 
 Some of its features include:
 
